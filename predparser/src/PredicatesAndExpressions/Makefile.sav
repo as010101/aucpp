@@ -1,0 +1,12 @@
+all: PredicatesAndExpressions.o
+	ld -r -o PredicatesAndExpressions.o *.o	
+#	strip PredicatesAndExpressions.o
+
+
+PredicatesAndExpressions.o:
+	c++ -g -c *.C
+
+
+clean:
+	rm -fr *.o *~
+

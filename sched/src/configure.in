@@ -1,0 +1,91 @@
+dnl Written for autoconf 2.5+ in mind
+AC_PREREQ(2.53)
+
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(Scheduler.C, 1.0, zippers@tux.cs.brown.edu, aurora)
+
+AC_LANG(C++)
+
+dnl Checks for programs.
+AC_PROG_CXX
+AC_PROG_CPP
+AC_PROG_LEX
+AC_PATH_PROG(ANT, ant, notfound)
+if test "$ANT" = notfound; then
+   AC_MSG_ERROR([ant not found. See http://jakarta.apache.org/ant])
+fi
+dnl Check for DB4 or higher
+AC_DB4
+dnl Confirm the libraries
+AC_CHECK_LIB(db-4.0, db_create)
+dnl Make sure this check is done in C++
+AC_CHECK_LIB(db_cxx-4.0, db_create)
+
+AC_SUBST(DB4_LIB_PATH)
+AC_ARG_WITH(libdb4,
+	AC_HELP_STRING([--with-db4=location], [location of db4 shared objects (default /usr/lib)]), DB4_LIB_PATH="$withval", DB4_LIB_PATH="/usr/lib")
+
+
+dnl Find db.h (a standard header) and db_cxx.h
+AC_CHECK_HEADERS(db.h)
+AC_CHECK_DB_CXX_HEADER
+
+dnl Check things in c++
+AC_CXX_BOOL
+AC_CXX_TEMPLATES
+
+dnl Posix threads
+AC_PTHREAD_HEADER
+dnl Now thorough check
+AC_CHECK_LIB(pthread, pthread_mutex_init)
+
+dnl java stuff
+AC_CHECK_JAVA_HOME
+AC_CHECK_CLASSPATH
+AC_PROG_JAVAC
+AC_PROG_JAVA
+dnl Class SpinnerUI only exists in Java 1.4 (and assumed in higher)
+AC_MSG_NOTICE([checking version of Java (need 1.4 or higher)])
+AC_CHECK_RQRD_CLASS(javax.swing.plaf.SpinnerUI)
+
+dnl Checks for libraries.
+dnl  I think xform stuff needs this
+AC_CHECK_LIB(nsl, yp_bind)
+dnl For the X11 lib, you usually need to find where it is (/usr/X11R6/lib for example)
+AC_SUBST(X11_LIB_PATH)
+AC_ARG_WITH(libx11,
+	AC_HELP_STRING([--with-x=location], [location of X Windows shared objects (default /usr/X11R6/lib)]), X11_LIB_PATH="$withval", X11_LIB_PATH="/usr/X11R6/lib")
+LDFLAGS="$LDFLAGS -L$X11_LIB_PATH"
+AC_CHECK_LIB(X11, XCreateWindow)
+
+
+dnl Replace `main' with a function in -lpthread:
+
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(strings.h unistd.h)
+
+dnl Check for STL
+AC_CXX_HAVE_STL
+AC_CXX_HAVE_STL_M_VARS
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_HEADER_TIME
+AC_STRUCT_TM
+AC_CHECK_TYPE(ssize_t, int)
+
+AC_COMPILE_CHECK_SIZEOF(char)
+AC_COMPILE_CHECK_SIZEOF(short)
+AC_COMPILE_CHECK_SIZEOF(int)
+AC_COMPILE_CHECK_SIZEOF(long)
+AC_COMPILE_CHECK_SIZEOF(double)
+AC_COMPILE_CHECK_SIZEOF(unsigned char *)
+AC_COMPILE_CHECK_SIZEOF(void *)
+
+dnl Checks for library functions.
+AC_TYPE_SIGNAL
+AC_CHECK_FUNCS(select)
+
+AC_OUTPUT(Makefile)

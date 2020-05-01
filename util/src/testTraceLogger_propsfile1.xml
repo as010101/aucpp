@@ -1,0 +1,12 @@
+<props>
+
+<TraceLogger.output.file   type="string" value="./testTraceLogger.log"/>
+<TraceLogger.output.stdout type="bool"   value="F"/>
+<TraceLogger.output.stderr type="bool"   value="F"/>
+
+<TraceLogger.group.thread_0 type="bool" value="T"/>
+<TraceLogger.group.thread_1 type="bool" value="F"/>
+<TraceLogger.group.thread_2 type="bool" value="T"/>
+<TraceLogger.group.thread_3 type="bool" value="T"/>
+
+</props>

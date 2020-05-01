@@ -1,0 +1,89 @@
+# AURORA SYSTEM: SCHEDULER MAKEFILE
+
+
+# Path settings
+PROJECTROOT = @srcdir@
+# @abs_srcdir@
+# @top_srcdir@ (to get to the root basically)
+
+# Compiler and standard options
+CXX = @CXX@
+CC = $(CXX)
+CXXFLAGS = @CXXFLAGS@
+CFLAGS = $(CXXFLAGS)
+DEFS = @DEFS@ 
+SLIBS = @LIBS@
+SLDFLAGS = @LDFLAGS@
+
+# Standard tools
+LEX = @LEX@ -F
+LEXLIB = @LEXLIB@
+
+# DB4
+DB4_INCLUDE_PATH = @DB4_INCLUDE_PATH@
+DB4_LIB_PATH = @DB4_LIB_PATH@
+
+# Component specific makefile follows:
+OBJS = main.o Scheduler.o shm_util.o sem_util.o check_ip.o  StreamThread.o SMInterface.o \
+		TupleDescription.o WorkerThread.o BoxExecutionQueue.o \
+		OldPredicate.o Shared.o  SysMon.o QueueMon.o\
+		MapQBox.o SelectQBox.o Catalog.o UnionQBox.o RestreamQBox.o QBox.o
+#               lex_stuff.o lex.yy.o JoinQBox.o MergeQBox.o ResampleQBox.o WMapQBox.o DropQBox.o 
+
+HDRS = BoxExecutionQueue.H \
+		QueueElement.H \
+		Scheduler.H \
+		WorkerThread.H
+
+LEXS = lex.yy.c
+
+EXEC = run
+
+INCL = \
+	-I. \
+	-I../../xforms/xforms/FORMS \
+	-I../../catalogmgr/src \
+	-I../../PredParser/PredicatesAndExpressions \
+	-I../../PredParser \
+	-I$(DB4_INCLUDE_PATH)/
+
+
+LDFLAGS = $(SLDFLAGS) \
+	-L/usr/lib \
+	-L$(DB4_LIB_PATH) \
+	-L../../catalogmgr/src
+
+
+LIBS =   $(SLIBS) \
+		../../catalogmgr/src/catalogmgr_api.a \
+		../../PredParser/Parse.a \
+		../../PredParser/PredicatesAndExpressions/PredicatesAndExpressions.a
+
+XFORMS_STUFF = -DSVR4 -I../../xforms/xforms/FORMS -L../../xforms/xforms/FORMS ../../xforms/xforms/FORMS/libforms.a
+
+all: $(EXEC)
+
+main: 
+	rm -f main.o
+	$(CC) $(CFLAGS) -c main.cpp $(RFLAGS) $(INCL) $(LDFLAGS) $(LIBS) 
+
+$(EXEC): $(LEXS) $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(INCL) $(RFLAGS) $(LDFLAGS) $(LIBS) $(LEXLIB) $(XFORMS_STUFF) 
+
+$(LEXS):
+	$(LEX) my_lex.l
+
+#lex.yy.c: my_lex.l
+
+
+%.o: %.c $(HDRS)
+	$(CC) $(CFLAGS) -c $< $(INCL) $(LDFLAGS)
+
+%.o: %.C $(HDRS)
+	$(CC) $(CFLAGS) -c $< $(INCL) $(LDFLAGS)
+
+clean: 
+	rm -f $(EXEC)
+	rm -f  *.o core *~
+	rm -rf Templates.DB
+	rm -f lex.yy.c

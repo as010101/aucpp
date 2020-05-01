@@ -1,0 +1,18 @@
+#ifndef FIELD_EXT_H
+#define FIELD_EXT_H
+
+#include "Function.H"
+
+class FieldExt : public Function
+{
+public:
+  FieldExt (int offset, int size);
+  ~FieldExt() {};
+  virtual char* evaluate(char* tuple);
+
+private:
+  int _offset;
+  int _size;
+};
+
+#endif

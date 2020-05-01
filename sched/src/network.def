@@ -1,0 +1,49 @@
+# NETWORK DESCRIPTION:
+#	network <num_boxes> <num_inputs> <num_outputs>
+# 	First line: network description: 3 1 1 .. 3 boxes, 1 input, 1 output
+#
+# BOX LINE EXAMPLES:
+#	box <box_id> <operator> <selectivity> <window_size> <pred_left_side_field> <pred_operator> <pred_right_side_type> <field_or_value>
+# 	box line: box 1 select 1.0 1 1 > v 10 
+#					box id 1 
+#					select type
+#					selectivity of 1.0
+#					window size 1
+#					field 1 > value 10
+# 	box line: box 2 select 1.0 1 1 > f 2 
+#					box id 1 
+#					select type
+#					selectivity of 1.0
+#					window size 1
+#					field 1 > field 2
+# ARC LINE EXAMPLES:
+#	arc 1 0 1 3 int float double
+#					arc id 1
+#					arc src 0 ... this means the input is a stream
+#								any arc that is fed by a stream will have src=0
+#					arc dest is box 1
+#					arc tuple description: 3 fields (int, float, double)
+#
+#	arc 4 3 0 3 int float double
+#					arc id 4
+#					arc src 3 .. the arc is fed by box 3
+#					arc dest 0 .. this means the output is sent to an application
+#					arc tuple description: 3 fields (int, float, double)
+#
+network 6 2 2
+box 1 select 1.0 1 1 > v 2 
+box 2 select 1.0 1 0 > v 0
+box 3 select 1.0 1 2 > v 10
+box 4 select 1.0 1 1 > v 0 
+box 5 select 1.0 1 0 > v 0
+box 6 select 1.0 1 2 > v 0
+arc 1 0 1 3 int int int
+arc 2 1 2 3 int int int
+arc 3 2 3 3 int int int
+arc 4 3 0 3 int int int
+arc 5 0 4 3 int int int
+arc 6 4 5 3 int int int
+arc 7 5 6 3 int int int
+arc 8 6 0 3 int int int
+input 1 0.1 10
+input 5 0.1 10
